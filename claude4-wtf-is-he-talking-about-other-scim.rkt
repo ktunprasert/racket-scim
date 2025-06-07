@@ -258,6 +258,7 @@
     (define parsed (parse-scim-filter filter-str))
     (displayln (format "AST: ~a" parsed))
     (displayln (format "JSON: ~a" (scim-filter->json parsed)))
+    (displayln "---\n")
     ;; (displayln (format "Go Query: ~a" (scim-filter->go-query parsed)))
     ))
 ;; (displayln "---")))
