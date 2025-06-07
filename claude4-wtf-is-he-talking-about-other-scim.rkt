@@ -203,18 +203,19 @@
 (define (scim-filter->go-query filter)
   (match filter
     [(scim-comparison-expr (scim-attr-path name sub #f) op value)
-     (format "query.Where(\"%s %s ?\", \"%s\", %s)"
+     ;; (format "query.Where(\"~a ~a ?\", \"~a\", ~a)"
+     (format "query.Where(\"~a ~a ?\", \"~a\")"
              (if sub
-                 (format "%s.%s" name sub)
+                 (format "~a.~a" name sub)
                  (symbol->string name))
              (op->sql op)
              (value->go-literal value))]
 
     [(scim-logical-expr 'and left right)
-     (format "(%s) AND (%s)" (scim-filter->go-query left) (scim-filter->go-query right))]
+     (format "(~a) AND (~a)" (scim-filter->go-query left) (scim-filter->go-query right))]
 
     [(scim-logical-expr 'or left right)
-     (format "(%s) OR (%s)" (scim-filter->go-query left) (scim-filter->go-query right))]
+     (format "(~a) OR (~a)" (scim-filter->go-query left) (scim-filter->go-query right))]
 
     [else "/* complex query */"]))
 
@@ -233,7 +234,7 @@
 
 (define (value->go-literal value)
   (cond
-    [(string? value) (format "\"%s\"" value)]
+    [(string? value) (format "\"~a\"" value)]
     [(number? value) (number->string value)]
     [(boolean? value) (if value "true" "false")]
     [else "null"]))
@@ -257,8 +258,9 @@
     (displayln (format "Filter: ~a" filter-str))
     (define parsed (parse-scim-filter filter-str))
     (displayln (format "AST: ~a" parsed))
-    (displayln (format "JSON: ~a" (scim-filter->json parsed)))
+    ;; (displayln (format "JSON: ~a" (scim-filter->json parsed)))
+    (displayln (format "Go Query: ~a" (scim-filter->go-query parsed)))
+    ;; (displayln (scim-filter->go-query parsed))
     (displayln "---\n")
-    ;; (displayln (format "Go Query: ~a" (scim-filter->go-query parsed)))
     ))
 ;; (displayln "---")))
